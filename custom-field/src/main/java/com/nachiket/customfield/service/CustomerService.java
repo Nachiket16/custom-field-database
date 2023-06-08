@@ -1,14 +1,18 @@
 package com.nachiket.customfield.service;
 
 import com.nachiket.customfield.entity.Customer;
+import com.nachiket.customfield.model.CustomerModel;
 import com.nachiket.customfield.repository.CustomerRepo;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 public class CustomerService {
@@ -18,7 +22,7 @@ public class CustomerService {
 
   public Map<String, Object> getAllUserWithValue() {
     List<Tuple> tuples = customerRepo.findCustom();
-    Map<String, Object> aliasMap = new HashMap<>();
+    Map<String, Object> aliasMap = new LinkedHashMap<>();
 
     if (tuples.isEmpty()) {
       System.out.println("The list of tuples is empty.");
@@ -36,10 +40,49 @@ public class CustomerService {
     return aliasMap;
   }
 
+  public CustomerModel getUserByAttribute(@RequestParam Long id) {
+    Customer customer = customerRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("No User found"));
+    List<Tuple> tuples = customerRepo.findUserById(customer.getCustomerId());
+
+    CustomerModel model = new CustomerModel();
+    model.setCustomerId(customer.getCustomerId());
+    model.setName(customer.getName());
+    model.setAddress(customer.getAddress());
+    model.setMobile(customer.getMobile());
+    List<Map<String, Object> > mapList = new ArrayList<>();
+    Map<String, Object> aliasMap = new LinkedHashMap<>();
+    for (Tuple tuple : tuples) {
+      for (TupleElement<?> tupleElement : tuple.getElements()) {
+        String alias = tupleElement.getAlias();
+        Object value = tuple.get(tupleElement);
+        aliasMap.put(alias, value);
+//        mapList.add(aliasMap);
+      }
+      for(Map.Entry<String,Object> map : aliasMap.entrySet()){
+        Map<String,Object> objectMap = new HashMap<>();
+        objectMap.put(map.getKey(),map.getValue());
+        mapList.add(0,objectMap);
+      }
+
+    }
+    model.setAttributeValue(mapList);
+
+    return model;
+  }
+
+
   public List<Customer> getAllUser() {
     List<Customer> allCustomerAndValue = customerRepo.findAll();
     return allCustomerAndValue;
   }
+
+  public Customer getUser(@RequestParam Long id) {
+    Customer customer = customerRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("No User found"));
+    return customer;
+  }
+
 
   public Customer saveCustomer(Customer customer) {
     Customer save = customerRepo.save(customer);

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,7 @@ public class CustomerController {
   private CustomerService customerService;
 
   @GetMapping("/hello")
-  public String hello(){
+  public String hello() {
     return "Hello from the controller";
   }
 
@@ -37,6 +38,19 @@ public class CustomerController {
   public ResponseEntity<List<Customer>> getAllUSer() {
     List<Customer> allUser = customerService.getAllUser();
     return ResponseEntity.ok(allUser);
+  }
+
+  @GetMapping("/{customerId}")
+  public ResponseEntity<Customer> getCustomerId(@PathVariable("customerId") Long id) {
+    Customer allUser = customerService.getUser(id);
+    return ResponseEntity.ok(allUser);
+  }
+
+  @GetMapping("/attribute/{customerId}")
+  public ResponseEntity<CustomerModel> getCustomerIdWithAttributeAndValue(@PathVariable(
+      "customerId") Long id) {
+    CustomerModel customerModel = customerService.getUserByAttribute(id);
+    return ResponseEntity.ok(customerModel);
   }
 
 

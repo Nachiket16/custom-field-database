@@ -1,5 +1,8 @@
 package com.nachiket.customfield.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,12 +28,15 @@ public class Value {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "attribute_id")
-  private Attribute attribute;
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "customer_id")
-  private Customer customer;
   private String value;
+  private long customerId;
+  private long attributeId;
+
+//  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//  @JoinColumn(name = "customer_id")
+
+//  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//  @JoinColumn(name = "attribute_id")
+
 
 }

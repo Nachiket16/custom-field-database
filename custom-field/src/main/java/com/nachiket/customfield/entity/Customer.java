@@ -2,6 +2,8 @@ package com.nachiket.customfield.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +31,9 @@ public class Customer {
   private String name;
   private String address;
   private String mobile;
-  @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private List<Value> values;
+  /*@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)*/
+//  @Embedded
+//  private List<Attribute> attributes;
+
 
 }

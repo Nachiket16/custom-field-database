@@ -1,7 +1,7 @@
 package com.nachiket.customfield.model;
 
-import com.nachiket.customfield.entity.Attribute;
-import com.nachiket.customfield.entity.Customer;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,11 +18,6 @@ public class CustomerModel {
   private String address;
   private String mobile;
   private String name;
-//  private Value values;
-
-  private long id;
-  private String value;
-  private Attribute attribute_id;
-  private Customer customer_id;
+  private List<Map<String,Object>> attributeValue;
 
 }
