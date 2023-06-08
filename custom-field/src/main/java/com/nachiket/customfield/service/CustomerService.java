@@ -50,8 +50,9 @@ public class CustomerService {
     model.setName(customer.getName());
     model.setAddress(customer.getAddress());
     model.setMobile(customer.getMobile());
-    List<Map<String, Object> > mapList = new ArrayList<>();
+    List<Map<String, Object>> mapList = new ArrayList<>();
     Map<String, Object> aliasMap = new LinkedHashMap<>();
+    Map<String, Object> objectMap = new HashMap<>();
     for (Tuple tuple : tuples) {
       for (TupleElement<?> tupleElement : tuple.getElements()) {
         String alias = tupleElement.getAlias();
@@ -59,13 +60,14 @@ public class CustomerService {
         aliasMap.put(alias, value);
 //        mapList.add(aliasMap);
       }
-      for(Map.Entry<String,Object> map : aliasMap.entrySet()){
-        Map<String,Object> objectMap = new HashMap<>();
-        objectMap.put(map.getKey(),map.getValue());
-        mapList.add(0,objectMap);
+      try {
+        objectMap.put(aliasMap.get("attribute_name").toString(), aliasMap.get("value"));
+      }catch (Exception e){
+        e.getMessage();
       }
 
     }
+    mapList.add(objectMap);
     model.setAttributeValue(mapList);
 
     return model;
