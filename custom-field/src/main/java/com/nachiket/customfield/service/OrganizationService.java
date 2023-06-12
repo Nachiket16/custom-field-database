@@ -6,13 +6,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nachiket.customfield.entity.EntityAttributes;
 import com.nachiket.customfield.entity.OrgAttributeValue;
 import com.nachiket.customfield.entity.Organization;
+import com.nachiket.customfield.exceptions.ResourceNotFoundException;
 import com.nachiket.customfield.repository.EntityAttributeRepo;
 import com.nachiket.customfield.repository.OrgAttributeValueRepo;
 import com.nachiket.customfield.repository.OrganizationRepo;
 import jakarta.persistence.Tuple;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,18 +84,27 @@ public class OrganizationService {
     return entity;
   }
 
-//  public List<JSONObject> getAllOrganizationWithAttributes(){
-//    //Create native query which will return attributes
-//    List<Tuple> allOrgAttributeWithValue = organizationRepo.getAllOrgAttributeWithValue();
-//    return null;
-//  }
-
   public String getOrganizationWithAttributesById(Long id) {
     List<Tuple> orgAttributeWithValue = organizationRepo.getOrgAttributeWithValue(id);
     //Convert this tuple into the JSON object
     String stringJson = convert(orgAttributeWithValue);
 
     return stringJson;
+  }
+
+  public void deleteOrganizationById(Long id) {
+    Organization organization = organizationRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Organization "
+            + "not found"));
+    organizationRepo.deleteOrgAttributeWithValue(organization.getId());
+  }
+
+  public List<String> getAllOrganizationWithAttributes() {
+    List<Tuple> orgAttributeWithValue = organizationRepo.getAllOrgAttributeWithValue();
+    //Convert this tuple into the JSON object
+    List<String> stringList = convertAll(orgAttributeWithValue);
+
+    return stringList;
   }
 
   public String convert(List<Tuple> tupleList) {
@@ -98,20 +115,17 @@ public class OrganizationService {
 
     for (Tuple tuple : tupleList) {
       // Extract common columns
+      Long id = tuple.get("id", Long.class);
       String name = tuple.get("name", String.class);
       String website = tuple.get("website", String.class);
 
-      // Extract different columns
-      String attributeName = tuple.get("attribute_name", String.class);
-      String attributeValue = tuple.get("attribute_value", String.class);
-
-
       // Add common columns to the main JsonObject
+      mainJson.put("id", id);
       mainJson.put("name", name);
       mainJson.put("website", website);
 
       // Add different columns JsonObject as a nested object
-      mainJson.put(tuple.get("attribute_name", String.class),tuple.get("attribute_value",
+      mainJson.put(tuple.get("attribute_name", String.class), tuple.get("attribute_value",
           String.class));
     }
 
@@ -121,6 +135,54 @@ public class OrganizationService {
       e.printStackTrace();
       return null;
     }
+  }
+
+  public List<String> convertAll(List<Tuple> tupleList) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNodeFactory nodeFactory = objectMapper.getNodeFactory();
+
+    List<String> jsonObjectList = new ArrayList<>();
+    Set<Long> uniqueIds = new HashSet<>();
+
+    for (Tuple tuple : tupleList) {
+      Long id = tuple.get("id", Long.class);
+      ObjectNode mainJson = nodeFactory.objectNode();
+
+      // Skip if ID is already processed
+      // if id is present but tuple is attribute name
+      if (uniqueIds.contains(id) && (tuple.get("attribute_name", String.class).isEmpty()
+          && tuple.get("attribute_value", String.class).isEmpty())) {
+        continue;
+      }
+
+      // Extract common columns
+      String name = tuple.get("name", String.class);
+      String website = tuple.get("website", String.class);
+
+      // Add common columns to the main JsonObject
+      mainJson.put("id", id);
+      mainJson.put("name", name);
+      mainJson.put("website", website);
+      mainJson.put(tuple.get("attribute_name", String.class),
+          tuple.get("attribute_value", String.class));
+
+      try {
+        String jsonString = objectMapper.writeValueAsString(mainJson);
+//        JsonReader jsonReader = Json.createReader(new StringReader(jsonString));
+//        JsonObject jsonObject = jsonReader.readObject();
+//        jsonReader.close();
+
+//        jsonObjectList.add(jsonObject);
+
+        jsonObjectList.add(jsonString);
+        // Add ID to the set of processed IDs
+        uniqueIds.add(id);
+      } catch (Exception e) {
+        e.getMessage();
+      }
+    }
+
+    return jsonObjectList;
   }
 
 }
