@@ -34,6 +34,14 @@ public class OrganizationController {
     return ResponseEntity.ok(organization);
   }
 
+  //FOR ATTRIBUTE PRESENT OR ELSE RETURN ERROR
+  @PostMapping("/addWithAttribute")
+  public ResponseEntity<Organization> addOrganizationHavingAttribute(
+      @RequestBody Map<String, Object> organiztion) {
+    Organization organization = organizationService.createOrganizationWithAttribute(organiztion);
+    return ResponseEntity.ok(organization);
+  }
+
   @GetMapping("/get")
   public ResponseEntity<List<String>> getAllOrganization() {
     List<String> allOrganizationWithAttributes = organizationService.getAllOrganizationWithAttributes();

@@ -11,17 +11,12 @@ import com.nachiket.customfield.repository.EntityAttributeRepo;
 import com.nachiket.customfield.repository.OrgAttributeValueRepo;
 import com.nachiket.customfield.repository.OrganizationRepo;
 import jakarta.persistence.Tuple;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +29,38 @@ public class OrganizationService {
   private EntityAttributeRepo entityAttributeRepo;
   @Autowired
   private OrgAttributeValueRepo orgAttributeValueRepo;
+
+  @Autowired
+  private Helper helper;
+
+  public Organization createOrganizationWithAttribute(Map<String, Object> object) {
+    Organization organization = new Organization();
+    organization.setName(object.get("name").toString());
+    organization.setWebsite(object.get("website").toString());
+    Organization entity = organizationRepo.save(organization);
+
+    boolean attributePresent = helper.isAttributePresent(object);
+    if (!attributePresent) {
+      throw new ResourceNotFoundException("Attribute not present");
+    }
+    OrgAttributeValue orgAttributeValue = new OrgAttributeValue();
+    for (Map.Entry<String, Object> entry : object.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      if (!key.equalsIgnoreCase("name") && !key.equalsIgnoreCase("website")) {
+        //Check if attribute is present or not ?
+        Optional<EntityAttributes> attributeName = entityAttributeRepo.findByAttributeName(key);
+        Long attributeId = attributeName.get().getId();
+        orgAttributeValue.setAttributeId(attributeId);
+        orgAttributeValue.setEntityId(entity.getId());
+        orgAttributeValue.setAttributeValue(value.toString());
+      }
+    }
+    OrgAttributeValue entityOrgAttributeValue = orgAttributeValueRepo.save(
+        orgAttributeValue);
+
+    return entity;
+  }
 
   public Organization createOrganization(Map<String, Object> object) {
     //Convert JSON OBJECT INTO THE OBJ OF THE CLASS ORGANIZATION
@@ -78,7 +105,8 @@ public class OrganizationService {
           orgAttributeValue.setAttributeValue(value.toString());
         }
 
-        OrgAttributeValue entityOrgAttributeValue = orgAttributeValueRepo.save(orgAttributeValue);
+        OrgAttributeValue entityOrgAttributeValue = orgAttributeValueRepo.save(
+            orgAttributeValue);
       }
     }
     return entity;
