@@ -85,6 +85,9 @@ public class OrganizationService {
   }
 
   public String getOrganizationWithAttributesById(Long id) {
+    Organization organization = organizationRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Organization "
+            + "not found"));
     List<Tuple> orgAttributeWithValue = organizationRepo.getOrgAttributeWithValue(id);
     //Convert this tuple into the JSON object
     String stringJson = convert(orgAttributeWithValue);
