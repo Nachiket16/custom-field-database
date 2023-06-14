@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "attribute")
 public class Attribute {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "attribute_id")
   private long attributeId;
   private String attributeName;

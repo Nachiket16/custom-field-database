@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class OrgAttributeValue {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private Long entityId;
   private Long attributeId;
