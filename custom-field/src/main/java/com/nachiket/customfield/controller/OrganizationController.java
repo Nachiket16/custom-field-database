@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,6 +63,21 @@ public class OrganizationController {
     ApiResponseMsg msg = ApiResponseMsg
         .builder()
         .msg("User is deleted Successfully")
+        .success(true)
+        .status(HttpStatus.OK)
+        .build();
+    return new ResponseEntity(msg, HttpStatus.OK);
+  }
+
+  @PutMapping("/{updateById}")
+  public ResponseEntity<ApiResponseMsg> updateOrganizationByID(
+      @PathVariable("updateById") Long updateById,
+      @RequestBody Map<String, Object> organization
+      ) {
+    organizationService.updateOrganizationById(updateById,organization);
+    ApiResponseMsg msg = ApiResponseMsg
+        .builder()
+        .msg("User is updated Successfully")
         .success(true)
         .status(HttpStatus.OK)
         .build();

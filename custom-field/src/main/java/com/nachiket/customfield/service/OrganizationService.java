@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -128,6 +129,47 @@ public class OrganizationService {
         .orElseThrow(() -> new ResourceNotFoundException("Organization "
             + "not found"));
     organizationRepo.deleteOrgAttributeWithValue(organization.getId());
+  }
+
+  public Organization updateOrganizationById(Long id, Map<String, Object> objectMap) {
+    Organization organization = organizationRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Organization "
+            + "not found"));
+    try {
+      organization.setName(objectMap.get("name").toString());
+      organization.setWebsite(objectMap.get("website").toString());
+    } catch (Exception e) {
+      e.getMessage();
+    }
+    Organization savedOrg = organizationRepo.save(organization);
+    boolean attributePresent = helper.isAttributePresent(objectMap);
+    if (!attributePresent) {
+      throw new ResourceNotFoundException("Attribute not present");
+    }
+
+    Optional<List<OrgAttributeValue>> attributeValueEntity =
+        orgAttributeValueRepo.findByEntityId(savedOrg.getId());
+
+    OrgAttributeValue orgAttributeValue = new OrgAttributeValue();
+
+    for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+
+      Optional<EntityAttributes> attribute = entityAttributeRepo.findByAttributeName(key);
+      if (!key.equalsIgnoreCase("name") && !key.equalsIgnoreCase("website")) {
+        for (OrgAttributeValue attributeValue : attributeValueEntity.get()) {
+          if (attribute.get().getId() == attributeValue.getAttributeId()) {
+            attributeValue.setAttributeValue(value.toString());
+            orgAttributeValueRepo.save(attributeValue);
+          }
+        }
+      }
+    }
+    OrgAttributeValue entityOrgAttributeValue = orgAttributeValueRepo.save(
+        orgAttributeValue);
+
+    return savedOrg;
   }
 
   public List<String> getAllOrganizationWithAttributes() {
