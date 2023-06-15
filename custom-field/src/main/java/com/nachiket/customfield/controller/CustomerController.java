@@ -1,11 +1,16 @@
 package com.nachiket.customfield.controller;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.nachiket.customfield.entity.Customer;
 import com.nachiket.customfield.model.CustomerModel;
 import com.nachiket.customfield.service.CustomerService;
 import jakarta.persistence.Tuple;
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +63,16 @@ public class CustomerController {
   public ResponseEntity<Customer> createUser(@RequestBody Customer customer) {
     Customer customer1 = customerService.saveCustomer(customer);
     return ResponseEntity.status(HttpStatus.CREATED).body(customer1);
+  }
+
+  @PostMapping("/json")
+  public void addUserJson(@RequestBody String customer) {
+    System.out.println("customer = " + customer);
+    JsonReader jsonReader = Json.createReader(new StringReader(customer));
+    JsonObject jsonObject = jsonReader.readObject();
+    jsonReader.close();
+    System.out.println("jsonObject = " + jsonObject);
+
   }
 
 
