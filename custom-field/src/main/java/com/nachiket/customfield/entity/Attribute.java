@@ -1,5 +1,6 @@
 package com.nachiket.customfield.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "attribute")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Attribute {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

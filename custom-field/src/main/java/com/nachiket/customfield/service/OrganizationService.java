@@ -1,5 +1,6 @@
 package com.nachiket.customfield.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -171,6 +172,29 @@ public class OrganizationService {
 
     return savedOrg;
   }
+
+
+
+  @Deprecated
+  public Organization updateOrganizationByIdUsingJackson(Long id, String jsonString) {
+    Organization organization = organizationRepo.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Organization "
+            + "not found"));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    //extract the value of different object present inside the payload
+    Organization organization1;
+    EntityAttributes entityAttributes;
+    OrgAttributeValue orgAttributeValue;
+    try {
+      objectMapper.readValue(jsonString, Organization.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+
+    return null;
+  }
+
 
   public List<String> getAllOrganizationWithAttributes() {
     List<Tuple> orgAttributeWithValue = organizationRepo.getAllOrgAttributeWithValue();

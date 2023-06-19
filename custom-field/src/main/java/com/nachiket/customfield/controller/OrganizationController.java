@@ -84,4 +84,20 @@ public class OrganizationController {
     return new ResponseEntity(msg, HttpStatus.OK);
   }
 
+  @PutMapping("/json/{updateById}")
+  public ResponseEntity<ApiResponseMsg> updateOrganizationById(
+      @PathVariable("updateById") Long updateById,
+      @RequestBody String organization
+  ) {
+    organizationService.updateOrganizationByIdUsingJackson(updateById,organization);
+    ApiResponseMsg msg = ApiResponseMsg
+        .builder()
+        .msg("User is updated Successfully")
+        .success(true)
+        .status(HttpStatus.OK)
+        .build();
+    return new ResponseEntity(msg, HttpStatus.OK);
+  }
+
+
 }

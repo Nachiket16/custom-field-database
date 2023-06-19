@@ -72,6 +72,7 @@ public class CustomerController {
     JsonObject jsonObject = jsonReader.readObject();
     jsonReader.close();
     System.out.println("jsonObject = " + jsonObject);
+    customerService.createObject(customer);
 
   }
 

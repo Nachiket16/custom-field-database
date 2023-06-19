@@ -1,5 +1,6 @@
 package com.nachiket.customfield.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "attribute_value")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Value {
 
   @Id

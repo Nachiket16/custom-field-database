@@ -1,5 +1,7 @@
 package com.nachiket.customfield.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nachiket.customfield.entity.Customer;
 import com.nachiket.customfield.model.CustomerModel;
 import com.nachiket.customfield.repository.CustomerRepo;
@@ -10,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.json.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -90,4 +93,17 @@ public class CustomerService {
     Customer save = customerRepo.save(customer);
     return save;
   }
+
+  public void createObject(String object){
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    Customer customer;
+    try {
+       customer = objectMapper.readValue(object, Customer.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    System.out.println("Customer : "+customer);
+  }
+
 }
